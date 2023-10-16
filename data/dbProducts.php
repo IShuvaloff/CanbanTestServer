@@ -52,7 +52,6 @@ function getProduct($id)
 
     if (!$product) throw new Exception('Сотрудник не найден', 1);
 
-
     $resultProduct = array(
       'method' => 'GET',
       'id' => $product['id'],
@@ -65,7 +64,7 @@ function getProduct($id)
         'rate' => $product['rating'],
         'count' => $product['voices']
       ),
-      'group' => $product['group'],
+      'group' => $product['agroup'],
     );
 
     return $resultProduct;
@@ -92,7 +91,11 @@ function addProduct($formData)
     mysqli_stmt_bind_param($stmt, 'sssds', $title, $description, $category, $price, $image);
     mysqli_stmt_execute($stmt);
 
-    return resultMessage();
+
+    return array(
+      array('result' => mysqli_insert_id($connect)),
+      array('error' => false),
+    );
   } catch (\Throwable $th) {
     return resultMessage('ОШИБКА добавления сотрудника: ' . $th->getMessage());
   }
@@ -105,9 +108,30 @@ function updateProduct($formData)
 
   if (!isset($formData) || !count($formData)) return array('result' => 'ОШИБКА: не переданы данные для обновления продукта');
 
+  $id = $formData['id'];
+  $title = $formData['title'];
+  $description = $formData['description'] ?? '';
+  $price = $formData['price'] ?? '';
+  $category = $formData['category'] ?? '';
+  $image = $formData['image'] ?? '';
+  $group = $formData['group'] ?? 1;
+
   try {
-    $stmt = mysqli_prepare($connect, 'insert into products(title, description, category, price, image) values(?, ?, ?, ?, ?)');
-    mysqli_stmt_bind_param($stmt, 'sssds', $title, $description, $category, $price, $image);
+    $stmt = mysqli_prepare(
+      $connect,
+      'update products set title = ?, description = ?, category = ?, price = ?, image = ?, agroup = ? where id = ?'
+    );
+    mysqli_stmt_bind_param(
+      $stmt,
+      'sssdsii',
+      $title,
+      $description,
+      $category,
+      $price,
+      $image,
+      $group,
+      $id
+    );
     mysqli_stmt_execute($stmt);
 
     return resultMessage();

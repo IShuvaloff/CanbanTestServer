@@ -39,7 +39,7 @@ function route($method, $urlData, $formData)
   if ($method === 'PUT' && count($formData) >= 1) {
     $result = updateProduct($formData);
 
-    echo json_encode($formData);
+    echo json_encode($result);
 
     return;
   }
