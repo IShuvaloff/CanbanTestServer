@@ -43,4 +43,13 @@ function route($method, $urlData, $formData)
 
     return;
   }
+
+  // DELETE /products/:id
+  if ($method === 'DELETE' && count($urlData) === 1) {
+    $result = deleteProduct($urlData[0]);
+
+    echo json_encode($result);
+
+    return;
+  }
 }

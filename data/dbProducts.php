@@ -139,3 +139,21 @@ function updateProduct($formData)
     return resultMessage('ОШИБКА обновления сотрудника: ' . $th->getMessage());
   }
 }
+
+function deleteProduct($id)
+{
+  global $connect;
+  if (!$connect) die('Подключение к базе не установлено!');
+
+  try {
+    $stmt = mysqli_prepare($connect, 'delete from products where id = ?');
+    mysqli_stmt_bind_param($stmt, 'i', $id);
+    $result = mysqli_stmt_execute($stmt);
+
+    if (!$result) throw new Exception('Ошибка удаления данных', 1); // ! такую проверку надо бы везде было делать, но опустим пока
+
+    return resultMessage();
+  } catch (\Throwable $th) {
+    return resultMessage('ОШИБКА: ' . $th->getMessage());
+  }
+}
